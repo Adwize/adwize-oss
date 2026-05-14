@@ -4,23 +4,26 @@ import sys
 import uuid
 from datetime import datetime, timedelta, timezone
 
-from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from api.models.alert import Alert
-from api.models.event import Event
-from api.models.rule import Rule, RuleType
-from api.services.alert_dispatcher import dispatch_webhook
-from api.services.rule_engine import (
+from sqlalchemy import select  # noqa: E402
+from sqlalchemy.ext.asyncio import (  # noqa: E402
+    AsyncSession,
+    async_sessionmaker,
+    create_async_engine,
+)
+
+from api.logger import get_logger  # noqa: E402
+from api.models.alert import Alert  # noqa: E402
+from api.models.event import Event  # noqa: E402
+from api.models.rule import Rule, RuleType  # noqa: E402
+from api.services.alert_dispatcher import dispatch_webhook  # noqa: E402
+from api.services.rule_engine import (  # noqa: E402
     check_should_create_alert,
     evaluate_field_validation_rule,
     evaluate_threshold_rule,
     evaluate_volume_rule,
 )
-
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-from api.logger import get_logger  # noqa: E402
 
 logger = get_logger(__name__)
 

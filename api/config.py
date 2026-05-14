@@ -1,6 +1,6 @@
 from functools import lru_cache
 
-from pydantic import Field, computed_field
+from pydantic import AliasChoices, Field, computed_field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -19,11 +19,26 @@ class Settings(BaseSettings):
 
     api_prefix: str = Field(default="/api/v1")
 
-    database_host: str = Field(default="localhost")
-    database_port: int = Field(default=5432)
-    database_name: str = Field(default="adwize")
-    database_user: str = Field(default="postgres")
-    database_password: str = Field(default="postgres")
+    database_host: str = Field(
+        default="localhost",
+        validation_alias=AliasChoices("database_host", "db_host"),
+    )
+    database_port: int = Field(
+        default=5432,
+        validation_alias=AliasChoices("database_port", "db_port"),
+    )
+    database_name: str = Field(
+        default="adwize",
+        validation_alias=AliasChoices("database_name", "db_name"),
+    )
+    database_user: str = Field(
+        default="postgres",
+        validation_alias=AliasChoices("database_user", "db_user"),
+    )
+    database_password: str = Field(
+        default="postgres",
+        validation_alias=AliasChoices("database_password", "db_password"),
+    )
     database_echo: bool = Field(default=False)
 
     api_key: str | None = Field(default=None)

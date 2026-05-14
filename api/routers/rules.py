@@ -42,17 +42,17 @@ async def create_rule(
     try:
         await db.commit()
         await db.refresh(rule)
-    except IntegrityError as e:
+    except IntegrityError:
         await db.rollback()
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail=f"Rule creation failed: {str(e)}",
+            detail="Rule creation failed due to a conflict",
         )
-    except Exception as e:
+    except Exception:
         await db.rollback()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to create rule: {str(e)}",
+            detail="Failed to create rule",
         )
 
     return RuleResponse.model_validate(rule)
@@ -150,11 +150,11 @@ async def update_rule(
     try:
         await db.commit()
         await db.refresh(rule)
-    except Exception as e:
+    except Exception:
         await db.rollback()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to update rule: {str(e)}",
+            detail="Failed to update rule",
         )
 
     return RuleResponse.model_validate(rule)
@@ -179,9 +179,9 @@ async def delete_rule(
 
     try:
         await db.commit()
-    except Exception as e:
+    except Exception:
         await db.rollback()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to delete rule: {str(e)}",
+            detail="Failed to delete rule",
         )

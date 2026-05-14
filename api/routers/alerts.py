@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from api.auth import check_api_key
 from api.config import get_settings
 from api.database import get_db
+from api.logger import get_logger
 from api.models.alert import Alert, AlertSeverity
 from api.models.rule import Rule, RuleType
 from api.schemas.alert import (
@@ -21,6 +22,7 @@ from api.schemas.alert import (
 from api.services.alert_dispatcher import dispatch_webhook
 
 router = APIRouter()
+logger = get_logger(__name__)
 
 
 @router.get("/", response_model=list[AlertResponse])
@@ -212,11 +214,11 @@ async def delete_alert(
     await db.delete(alert)
     try:
         await db.commit()
-    except Exception as e:
+    except Exception:
         await db.rollback()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to delete alert: {str(e)}",
+            detail="Failed to delete alert",
         )
 
 
@@ -247,11 +249,11 @@ async def resolve_alert(
     try:
         await db.commit()
         await db.refresh(alert)
-    except Exception as e:
+    except Exception:
         await db.rollback()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to resolve alert: {str(e)}",
+            detail="Failed to resolve alert",
         )
 
     settings = get_settings()
@@ -259,7 +261,7 @@ async def resolve_alert(
         try:
             await dispatch_webhook(alert, settings.webhook_url, db, event_type="resolved")
         except Exception:
-            pass
+            logger.exception(f"Failed to send resolve webhook for alert {alert_id}")
 
     return AlertResponse.model_validate(alert)
 
@@ -293,11 +295,11 @@ async def acknowledge_alert(
     try:
         await db.commit()
         await db.refresh(alert)
-    except Exception as e:
+    except Exception:
         await db.rollback()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to acknowledge alert: {str(e)}",
+            detail="Failed to acknowledge alert",
         )
 
     return AlertResponse.model_validate(alert)
@@ -329,11 +331,11 @@ async def snooze_alert(
     try:
         await db.commit()
         await db.refresh(alert)
-    except Exception as e:
+    except Exception:
         await db.rollback()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to snooze alert: {str(e)}",
+            detail="Failed to snooze alert",
         )
 
     return AlertResponse.model_validate(alert)
@@ -358,11 +360,11 @@ async def unsnooze_alert(
     try:
         await db.commit()
         await db.refresh(alert)
-    except Exception as e:
+    except Exception:
         await db.rollback()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to unsnooze alert: {str(e)}",
+            detail="Failed to unsnooze alert",
         )
 
     return AlertResponse.model_validate(alert)
@@ -393,6 +395,7 @@ async def send_test_notification(
         webhook_type=request.webhook_type,
         event_type="triggered",
         rule_name="Test Rule",
+        persist_log=False,
     )
 
     return {"success": success, "webhook_url": request.webhook_url}

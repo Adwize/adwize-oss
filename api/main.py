@@ -16,12 +16,8 @@ settings = get_settings()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    from api.event_buffer import event_buffer
-
     logger.info(f"Starting {settings.app_name} {settings.app_version}")
-    await event_buffer.start()
     yield
-    await event_buffer.stop()
     logger.info("Shutting down...")
 
 
@@ -64,7 +60,7 @@ async def add_request_id(request: Request, call_next) -> Response:
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
-    allow_credentials=True,
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
