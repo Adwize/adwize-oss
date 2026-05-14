@@ -1,6 +1,6 @@
 [project]
 name = "adwize"
-version = "0.0.1"
+version = "0.1.0"
 description = "Open-source event monitoring with deterministic rules and webhook alerts"
 readme = "README.md"
 license = {text = "Apache-2.0"}

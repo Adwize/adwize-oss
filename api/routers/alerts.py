@@ -33,8 +33,9 @@ async def list_alerts(
     limit: int = Query(50, ge=1, le=100),
     offset: int = Query(0, ge=0),
 ) -> list[AlertResponse]:
-    query = select(Alert, Rule.name.label("rule_name"), Rule.rule_type.label("rule_type")).join(
-        Rule, Alert.rule_id == Rule.id, isouter=True
+    query = (
+        select(Alert, Rule.name.label("rule_name"), Rule.rule_type.label("rule_type"))
+        .join(Rule, Alert.rule_id == Rule.id, isouter=True)
     )
 
     if rule_id:
@@ -78,13 +79,16 @@ async def list_grouped_alerts(
     sparkline_start = now - timedelta(days=7)
     bucket_duration = timedelta(days=7) / 8
 
-    query = select(
-        Alert,
-        Rule.name.label("rule_name"),
-        Rule.rule_type.label("rule_type"),
-        Rule.tag.label("rule_tag"),
-        Rule.category.label("rule_category"),
-    ).join(Rule, Alert.rule_id == Rule.id)
+    query = (
+        select(
+            Alert,
+            Rule.name.label("rule_name"),
+            Rule.rule_type.label("rule_type"),
+            Rule.tag.label("rule_tag"),
+            Rule.category.label("rule_category"),
+        )
+        .join(Rule, Alert.rule_id == Rule.id)
+    )
 
     if severity:
         query = query.where(Alert.severity == severity)
@@ -231,14 +235,10 @@ async def resolve_alert(
     alert = result.scalar_one_or_none()
 
     if not alert:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail=f"Alert {alert_id} not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Alert {alert_id} not found")
 
     if alert.resolved_at is not None:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="Alert is already resolved"
-        )
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Alert is already resolved")
 
     alert.resolved_at = datetime.now(timezone.utc).replace(tzinfo=None)
     if resolve_data.note:
@@ -249,10 +249,7 @@ async def resolve_alert(
         await db.refresh(alert)
     except Exception as e:
         await db.rollback()
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to resolve alert: {str(e)}",
-        )
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to resolve alert: {str(e)}")
 
     settings = get_settings()
     if settings.webhook_url:
@@ -275,14 +272,10 @@ async def acknowledge_alert(
     alert = result.scalar_one_or_none()
 
     if not alert:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail=f"Alert {alert_id} not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Alert {alert_id} not found")
 
     if alert.acknowledged_at is not None:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="Alert is already acknowledged"
-        )
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Alert is already acknowledged")
 
     alert.acknowledged_at = datetime.now(timezone.utc).replace(tzinfo=None)
     if ack_data.note:
@@ -295,10 +288,7 @@ async def acknowledge_alert(
         await db.refresh(alert)
     except Exception as e:
         await db.rollback()
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to acknowledge alert: {str(e)}",
-        )
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to acknowledge alert: {str(e)}")
 
     return AlertResponse.model_validate(alert)
 
@@ -314,14 +304,10 @@ async def snooze_alert(
     alert = result.scalar_one_or_none()
 
     if not alert:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail=f"Alert {alert_id} not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Alert {alert_id} not found")
 
     if alert.resolved_at is not None:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="Cannot snooze a resolved alert"
-        )
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Cannot snooze a resolved alert")
 
     now = datetime.now(timezone.utc).replace(tzinfo=None)
     alert.snoozed_until = now + timedelta(minutes=snooze_data.duration_minutes)
@@ -331,10 +317,7 @@ async def snooze_alert(
         await db.refresh(alert)
     except Exception as e:
         await db.rollback()
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to snooze alert: {str(e)}",
-        )
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to snooze alert: {str(e)}")
 
     return AlertResponse.model_validate(alert)
 
@@ -349,9 +332,7 @@ async def unsnooze_alert(
     alert = result.scalar_one_or_none()
 
     if not alert:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail=f"Alert {alert_id} not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Alert {alert_id} not found")
 
     alert.snoozed_until = None
 
@@ -360,10 +341,7 @@ async def unsnooze_alert(
         await db.refresh(alert)
     except Exception as e:
         await db.rollback()
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to unsnooze alert: {str(e)}",
-        )
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to unsnooze alert: {str(e)}")
 
     return AlertResponse.model_validate(alert)
 

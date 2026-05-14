@@ -46,7 +46,9 @@ async def db_session(test_session_factory) -> AsyncGenerator[AsyncSession, None]
     async with test_session_factory() as session:
         yield session
         for table in ["notification_logs", "alerts", "rules", "events"]:
-            await session.execute(__import__("sqlalchemy").text(f"DELETE FROM {table}"))
+            await session.execute(
+                __import__("sqlalchemy").text(f"DELETE FROM {table}")
+            )
         await session.commit()
 
 

@@ -519,18 +519,14 @@ class TestNumericValidations:
         db_mock = AsyncMock(spec=AsyncSession)
 
         event_pass = Event(
-            id=uuid.uuid4(),
-            source="web",
-            event_type="purchase",
+            id=uuid.uuid4(), source="web", event_type="purchase",
             event_data={"value": 100, "currency": "USD"},
             received_at=datetime.now(timezone.utc).replace(tzinfo=None),
         )
         assert await evaluate_field_validation_rule(rule, event_pass, db_mock) is None
 
         event_fail_currency = Event(
-            id=uuid.uuid4(),
-            source="web",
-            event_type="purchase",
+            id=uuid.uuid4(), source="web", event_type="purchase",
             event_data={"value": 100, "currency": "GBP"},
             received_at=datetime.now(timezone.utc).replace(tzinfo=None),
         )
@@ -539,9 +535,7 @@ class TestNumericValidations:
         assert "currency" in alert.message
 
         event_fail_value = Event(
-            id=uuid.uuid4(),
-            source="web",
-            event_type="purchase",
+            id=uuid.uuid4(), source="web", event_type="purchase",
             event_data={"value": 0, "currency": "USD"},
             received_at=datetime.now(timezone.utc).replace(tzinfo=None),
         )
@@ -550,9 +544,7 @@ class TestNumericValidations:
         assert "Numeric validation failed" in alert.message
 
         event_fail_both = Event(
-            id=uuid.uuid4(),
-            source="web",
-            event_type="purchase",
+            id=uuid.uuid4(), source="web", event_type="purchase",
             event_data={"value": -10, "currency": "GBP"},
             received_at=datetime.now(timezone.utc).replace(tzinfo=None),
         )
@@ -578,9 +570,7 @@ class TestNumericValidations:
         db_mock = AsyncMock(spec=AsyncSession)
 
         event = Event(
-            id=uuid.uuid4(),
-            source="web",
-            event_type="page_view",
+            id=uuid.uuid4(), source="web", event_type="page_view",
             event_data={"value": 100, "currency": "EUR"},
             received_at=datetime.now(timezone.utc).replace(tzinfo=None),
         )

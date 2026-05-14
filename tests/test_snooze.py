@@ -34,7 +34,6 @@ def make_alert(rule_id):
             resolved_at=resolved_at,
             context={},
         )
-
     return _make
 
 
@@ -109,7 +108,9 @@ class TestSnoozeModel:
         assert alert.snoozed_until is None
 
     async def test_cannot_snooze_resolved_alert(self, make_alert):
-        alert = make_alert(resolved_at=datetime.now(timezone.utc).replace(tzinfo=None))
+        alert = make_alert(
+            resolved_at=datetime.now(timezone.utc).replace(tzinfo=None)
+        )
         assert alert.resolved_at is not None
 
 

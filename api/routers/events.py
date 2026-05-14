@@ -202,15 +202,13 @@ async def stream_events(
                 new_events = result.scalars().all()
 
                 for e in new_events:
-                    data = json_mod.dumps(
-                        {
-                            "id": str(e.id),
-                            "source": e.source,
-                            "event_type": e.event_type,
-                            "event_data": e.event_data,
-                            "received_at": e.received_at.isoformat() if e.received_at else None,
-                        }
-                    )
+                    data = json_mod.dumps({
+                        "id": str(e.id),
+                        "source": e.source,
+                        "event_type": e.event_type,
+                        "event_data": e.event_data,
+                        "received_at": e.received_at.isoformat() if e.received_at else None,
+                    })
                     yield f"data: {data}\n\n"
                     if e.received_at and e.received_at > last_seen:
                         last_seen = e.received_at

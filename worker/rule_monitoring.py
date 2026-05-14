@@ -37,14 +37,12 @@ def _build_database_url() -> str:
 async def _check_snoozed(rule_id: uuid.UUID, session: AsyncSession) -> bool:
     now = datetime.now(timezone.utc).replace(tzinfo=None)
     result = await session.execute(
-        select(Alert)
-        .where(
+        select(Alert).where(
             Alert.rule_id == rule_id,
             Alert.snoozed_until.is_not(None),
             Alert.snoozed_until > now,
             Alert.resolved_at.is_(None),
-        )
-        .limit(1)
+        ).limit(1)
     )
     return result.scalar_one_or_none() is not None
 
@@ -105,10 +103,7 @@ async def evaluate_all_rules():
 
                     if alert:
                         should_create = await check_should_create_alert(
-                            rule.id,
-                            alert.source,
-                            alert.event_type,
-                            session,
+                            rule.id, alert.source, alert.event_type, session,
                         )
                         if not should_create:
                             logger.debug(f"Skipping {rule.name} (recent alert exists)")

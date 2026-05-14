@@ -138,7 +138,8 @@ async def evaluate_field_validation_rule(
 
     required_fields = config.get("required_fields", [])
     missing_fields = [
-        f for f in required_fields if f not in event.event_data or event.event_data[f] is None
+        f for f in required_fields
+        if f not in event.event_data or event.event_data[f] is None
     ]
     if missing_fields:
         violations.append(f"Missing required fields: {', '.join(missing_fields)}")
