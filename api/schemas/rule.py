@@ -39,7 +39,9 @@ class NumericValidation(BaseModel):
     left_field: Optional[str] = Field(None, description="Left field for comparison")
     operator: str = Field(..., description="Comparison operator: <, <=, >, >=, ==, !=")
     threshold: Optional[float] = Field(None, description="Threshold value to compare against")
-    right_field: Optional[str] = Field(None, description="Right field for field-to-field comparison")
+    right_field: Optional[str] = Field(
+        None, description="Right field for field-to-field comparison"
+    )
     description: Optional[str] = Field(None, description="Human-readable description")
 
     @field_validator("operator")

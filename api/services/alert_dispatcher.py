@@ -60,9 +60,7 @@ async def check_destination_cooldown(
             NotificationLog.created_at >= threshold,
         )
     )
-    query = query.where(
-        (Alert.rule_id == rule_id) | (NotificationLog.alert_id.is_(None))
-    )
+    query = query.where((Alert.rule_id == rule_id) | (NotificationLog.alert_id.is_(None)))
 
     result = await db.execute(query.limit(1))
     recent = result.scalar_one_or_none()

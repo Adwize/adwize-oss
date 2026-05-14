@@ -26,21 +26,15 @@ class TestThresholdConfig:
 
     def test_invalid_operator_rejected(self):
         with pytest.raises(Exception):
-            ThresholdConfig(
-                field="count", operator="~", value=100, window_minutes=5
-            )
+            ThresholdConfig(field="count", operator="~", value=100, window_minutes=5)
 
     def test_invalid_field_rejected(self):
         with pytest.raises(Exception):
-            ThresholdConfig(
-                field="invalid_field", operator=">", value=100, window_minutes=5
-            )
+            ThresholdConfig(field="invalid_field", operator=">", value=100, window_minutes=5)
 
     def test_zero_window_rejected(self):
         with pytest.raises(Exception):
-            ThresholdConfig(
-                field="count", operator=">", value=100, window_minutes=0
-            )
+            ThresholdConfig(field="count", operator=">", value=100, window_minutes=0)
 
 
 class TestFieldValidationConfig:

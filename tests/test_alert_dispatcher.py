@@ -33,6 +33,7 @@ def make_alert():
             triggered_at=datetime.now(timezone.utc).replace(tzinfo=None),
             context=context or {},
         )
+
     return _make
 
 
