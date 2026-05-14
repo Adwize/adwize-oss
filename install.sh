@@ -4,21 +4,6 @@ set -euo pipefail
 REPO_URL="https://github.com/Adwize/adwize-oss.git"
 INSTALL_DIR="${ADWIZE_DIR:-$HOME/adwize}"
 
-<<<<<<< HEAD
-BOLD='\033[1m'
-GREEN='\033[0;32m'
-YELLOW='\033[0;33m'
-RED='\033[0;31m'
-DIM='\033[2m'
-NC='\033[0m'
-CYAN='\033[0;36m'
-BLUE='\033[0;34m'
-MAGENTA='\033[0;35m'
-BOLD_CYAN='\033[1;36m'
-BOLD_BLUE='\033[1;34m'
-BOLD_MAGENTA='\033[1;35m'
-BOLD_GREEN='\033[1;32m'
-=======
 BOLD=$'\033[1m'
 GREEN=$'\033[0;32m'
 YELLOW=$'\033[0;33m'
@@ -29,28 +14,18 @@ BOLD_CYAN=$'\033[1;36m'
 BOLD_BLUE=$'\033[1;34m'
 BOLD_MAGENTA=$'\033[1;35m'
 BOLD_GREEN=$'\033[1;32m'
->>>>>>> 58a6711 (fix: rendering install script)
 
 info()  { echo "${GREEN}▸${NC} $1"; }
 warn()  { echo "${YELLOW}▸${NC} $1"; }
 error() { echo "${RED}✗${NC} $1"; exit 1; }
 
 echo ""
-<<<<<<< HEAD
-echo "${BOLD_MAGENTA}     █████╗ ${BOLD_MAGENTA}██████╗ ${BOLD_MAGENTA}██╗    ██╗${BOLD_MAGENTA}██╗${BOLD_MAGENTA}███████╗${BOLD_MAGENTA}███████╗${NC}"
-echo "${BOLD_MAGENTA}    ██╔══██╗${BOLD_MAGENTA}██╔══██╗${BOLD_MAGENTA}██║    ██║${BOLD_MAGENTA}██║${BOLD_MAGENTA}╚══███╔╝${BOLD_MAGENTA}██╔════╝${NC}"
-echo "${BOLD_MAGENTA}    ███████║${BOLD_MAGENTA}██║  ██║${BOLD_MAGENTA}██║ █╗ ██║${BOLD_MAGENTA}██║${BOLD_MAGENTA}  ███╔╝ ${BOLD_MAGENTA}█████╗  ${NC}"
-echo "${BOLD_MAGENTA}    ██╔══██║${BOLD_MAGENTA}██║  ██║${BOLD_MAGENTA}██║███╗██║${BOLD_MAGENTA}██║${BOLD_MAGENTA} ███╔╝  ${BOLD_MAGENTA}██╔══╝  ${NC}"
-echo "${BOLD_MAGENTA}    ██║  ██║${BOLD_MAGENTA}██████╔╝${BOLD_MAGENTA}╚███╔███╔╝${BOLD_MAGENTA}██║${BOLD_MAGENTA}███████╗${BOLD_MAGENTA}███████╗${NC}"
-echo "${BOLD_MAGENTA}    ╚═╝  ╚═╝${BOLD_MAGENTA}╚═════╝ ${BOLD_MAGENTA} ╚══╝╚══╝ ${BOLD_MAGENTA}╚═╝${BOLD_MAGENTA}╚══════╝${BOLD_MAGENTA}╚══════╝${NC}"
-=======
 echo "${BOLD_CYAN}     █████╗ ${BOLD_BLUE}██████╗ ${BOLD_MAGENTA}██╗    ██╗${BOLD_GREEN}██╗${BOLD_CYAN}███████╗${BOLD_BLUE}███████╗${NC}"
 echo "${BOLD_CYAN}    ██╔══██╗${BOLD_BLUE}██╔══██╗${BOLD_MAGENTA}██║    ██║${BOLD_GREEN}██║${BOLD_CYAN}╚══███╔╝${BOLD_BLUE}██╔════╝${NC}"
 echo "${BOLD_CYAN}    ███████║${BOLD_BLUE}██║  ██║${BOLD_MAGENTA}██║ █╗ ██║${BOLD_GREEN}██║${BOLD_CYAN}  ███╔╝ ${BOLD_BLUE}█████╗  ${NC}"
 echo "${BOLD_CYAN}    ██╔══██║${BOLD_BLUE}██║  ██║${BOLD_MAGENTA}██║███╗██║${BOLD_GREEN}██║${BOLD_CYAN} ███╔╝  ${BOLD_BLUE}██╔══╝  ${NC}"
 echo "${BOLD_CYAN}    ██║  ██║${BOLD_BLUE}██████╔╝${BOLD_MAGENTA}╚███╔███╔╝${BOLD_GREEN}██║${BOLD_CYAN}███████╗${BOLD_BLUE}███████╗${NC}"
 echo "${BOLD_CYAN}    ╚═╝  ╚═╝${BOLD_BLUE}╚═════╝ ${BOLD_MAGENTA} ╚══╝╚══╝ ${BOLD_GREEN}╚═╝${BOLD_CYAN}╚══════╝${BOLD_BLUE}╚══════╝${NC}"
->>>>>>> 58a6711 (fix: rendering install script)
 echo ""
 echo "    ${DIM}Open-source event monitoring with deterministic rules${NC}"
 echo "    ${DIM}and webhook alerts.${NC}"
@@ -74,53 +49,6 @@ fi
 
 # --- Clone ---
 
-<<<<<<< HEAD
-# if [ -d "$INSTALL_DIR" ]; then
-#     warn "Directory $INSTALL_DIR already exists."
-#     read -p "  Update existing installation? [Y/n] " -n 1 -r
-#     echo
-#     if [[ $REPLY =~ ^[Yy]$ ]] || [[ -z $REPLY ]]; then
-#         info "Updating..."
-#         cd "$INSTALL_DIR"
-#         git pull --ff-only || warn "Could not fast-forward. Manual update may be needed."
-#     else
-#         info "Keeping existing installation."
-#     fi
-# else
-#     info "Cloning Adwize to $INSTALL_DIR..."
-#     git clone --depth 1 "$REPO_URL" "$INSTALL_DIR"
-# fi
-
-# cd "$INSTALL_DIR"
-
-# # --- Install CLI ---
-
-# info "Installing Adwize CLI..."
-# uv sync --quiet 2>/dev/null || uv sync
-
-# if ! command -v adwize >/dev/null 2>&1; then
-#     info "Adding adwize to PATH..."
-
-#     SHELL_NAME=$(basename "$SHELL")
-#     case "$SHELL_NAME" in
-#         zsh)  RC_FILE="$HOME/.zshrc" ;;
-#         bash) RC_FILE="$HOME/.bashrc" ;;
-#         fish) RC_FILE="$HOME/.config/fish/config.fish" ;;
-#         *)    RC_FILE="$HOME/.profile" ;;
-#     esac
-
-#     VENV_BIN="$INSTALL_DIR/.venv/bin"
-#     if [ -d "$VENV_BIN" ]; then
-#         if ! grep -q "adwize" "$RC_FILE" 2>/dev/null; then
-#             echo "" >> "$RC_FILE"
-#             echo "# Adwize CLI" >> "$RC_FILE"
-#             echo "export PATH=\"$VENV_BIN:\$PATH\"" >> "$RC_FILE"
-#             info "Added $VENV_BIN to PATH in $RC_FILE"
-#         fi
-#         export PATH="$VENV_BIN:$PATH"
-#     fi
-# fi
-=======
 if [ -d "$INSTALL_DIR" ]; then
     warn "Directory $INSTALL_DIR already exists."
     read -p "  Update existing installation? [Y/n] " -n 1 -r
@@ -166,7 +94,6 @@ if ! command -v adwize >/dev/null 2>&1; then
         export PATH="$VENV_BIN:$PATH"
     fi
 fi
->>>>>>> 58a6711 (fix: rendering install script)
 
 echo ""
 echo "  ${BOLD_GREEN}✓ Adwize installed successfully!${NC}"
