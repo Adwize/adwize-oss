@@ -1,10 +1,11 @@
 """Test optional API key authentication."""
 
-import pytest
 from unittest.mock import patch
 
-from api.auth import check_api_key
+import pytest
 from fastapi import HTTPException
+
+from api.auth import check_api_key
 
 
 class TestOptionalApiKey:
