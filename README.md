@@ -1,22 +1,22 @@
 # Adwize
 
-Event monitoring with deterministic rules and webhook alerts. Ingest events from any source, define validation and threshold rules, and get notified via webhooks when something goes wrong.
+Open-source event monitoring with deterministic rules and webhook alerts. Ingest events from any source, define validation and threshold rules, and get notified instantly via webhooks when something goes wrong.
 
 ## Features
 
-- **Event ingestion**: Stream events via REST API with buffered bulk writes
-- **Three rule types**: Threshold, Field Validation, and Volume anomaly detection
-- **Webhook alerts**: Slack, Teams, or custom webhook notifications with retry
-- **CLI**: Full management from the terminal with `adwize` commands
-- **MCP Server**: AI-native interface for Cursor, Claude Desktop, and other MCP clients
-- **Self-hosted**: Runs entirely on your infrastructure with Docker
+- **Event ingestion** — Stream events via REST API with buffered bulk writes
+- **Three rule types** — Threshold, Field Validation, and Volume anomaly detection
+- **Webhook alerts** — Slack, Teams, or custom webhook notifications with retry
+- **CLI** — Full management from the terminal with `adwize` commands
+- **MCP Server** — AI-native interface for Cursor, Claude Desktop, and other MCP clients
+- **Self-hosted** — Runs entirely on your infrastructure with Docker
 
 ## Quick Start
 
 ### One-liner install
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/tagsavvy/adwize-oss/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/Adwize/adwize-oss/main/install.sh | bash
 ```
 
 Then run the setup wizard:
@@ -29,13 +29,17 @@ adwize setup
 ### Manual setup
 
 ```bash
-git clone https://github.com/tagsavvy/adwize-oss.git
+git clone https://github.com/Adwize/adwize-oss.git
 cd adwize-oss
-cp .env.example .env        # edit with your settings
-docker compose up -d --build
+cp .env.example .env          # edit with your settings
+docker compose up -d --build  # start API, worker, Postgres
+uv sync                       # install CLI on your machine
+source .venv/bin/activate     # activate to use `adwize` directly
 ```
 
 The API will be available at `http://localhost:8000` with interactive docs at `/docs`.
+
+> **Note:** `docker compose` runs the backend services. The CLI is a separate tool that runs on your machine and talks to the API. Install it with `uv sync`, then use `adwize <command>` or `uv run adwize <command>`.
 
 ## Usage
 
@@ -138,6 +142,10 @@ Or without the CLI on PATH:
 }
 ```
 
+## HLD
+
+![Adwize HLD](docs/static/adwize-oss-hld.png)
+
 ## Configuration
 
 The CLI stores config in `~/.adwize/config.json` (created by `adwize setup`). Environment variables take priority.
@@ -155,10 +163,10 @@ The CLI stores config in `~/.adwize/config.json` (created by `adwize setup`). En
 ## Development
 
 ```bash
-uv sync                              # Install dependencies
-uv run uvicorn api.main:app --reload  # Run API locally
-uv run python worker/rule_monitoring.py --once  # Run worker once
-uv run python mcp_server/server.py    # Run MCP server
+uv sync
+uv run uvicorn api.main:app --reload
+uv run python worker/rule_monitoring.py --once
+uv run python mcp_server/server.py
 ```
 
 ## License
