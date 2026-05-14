@@ -34,11 +34,11 @@ async def ingest_events(
 
     try:
         await bulk_insert_events(db, rows)
-    except Exception as e:
+    except Exception:
         await db.rollback()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to store events: {str(e)}",
+            detail="Failed to store events",
         )
 
     created_events = [

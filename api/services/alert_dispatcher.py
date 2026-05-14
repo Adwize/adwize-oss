@@ -13,8 +13,6 @@ from api.models.notification_log import NotificationLog
 
 logger = get_logger(__name__)
 
-SEVERITY_ORDER = {"info": 0, "warning": 1, "critical": 2}
-
 
 async def dispatch_webhook(
     alert: Alert,
@@ -23,6 +21,7 @@ async def dispatch_webhook(
     webhook_type: str = "webhook",
     event_type: str = "triggered",
     rule_name: str | None = None,
+    persist_log: bool = True,
 ) -> bool:
     """Send alert notification to a webhook URL."""
     payload = _build_base_payload(alert, event_type)
@@ -33,7 +32,7 @@ async def dispatch_webhook(
     return await _send_webhook_with_retry(
         url=webhook_url,
         payload=formatted_payload,
-        alert_id=alert.id,
+        alert_id=alert.id if persist_log else None,
         db=db,
         destination_type=webhook_type,
         max_retries=3,
