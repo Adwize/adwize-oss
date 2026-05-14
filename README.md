@@ -13,6 +13,8 @@ Open-source event monitoring with deterministic rules and webhook alerts. Ingest
 
 ## Quick Start
 
+![Adwize CLI](docs/static/adwize-cli.png) 
+
 ### One-liner install
 
 ```bash
