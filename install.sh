@@ -20,12 +20,12 @@ warn()  { echo "${YELLOW}▸${NC} $1"; }
 error() { echo "${RED}✗${NC} $1"; exit 1; }
 
 echo ""
-echo "${BOLD_CYAN}     █████╗ ${BOLD_BLUE}██████╗ ${BOLD_MAGENTA}██╗    ██╗${BOLD_GREEN}██╗${BOLD_CYAN}███████╗${BOLD_BLUE}███████╗${NC}"
-echo "${BOLD_CYAN}    ██╔══██╗${BOLD_BLUE}██╔══██╗${BOLD_MAGENTA}██║    ██║${BOLD_GREEN}██║${BOLD_CYAN}╚══███╔╝${BOLD_BLUE}██╔════╝${NC}"
-echo "${BOLD_CYAN}    ███████║${BOLD_BLUE}██║  ██║${BOLD_MAGENTA}██║ █╗ ██║${BOLD_GREEN}██║${BOLD_CYAN}  ███╔╝ ${BOLD_BLUE}█████╗  ${NC}"
-echo "${BOLD_CYAN}    ██╔══██║${BOLD_BLUE}██║  ██║${BOLD_MAGENTA}██║███╗██║${BOLD_GREEN}██║${BOLD_CYAN} ███╔╝  ${BOLD_BLUE}██╔══╝  ${NC}"
-echo "${BOLD_CYAN}    ██║  ██║${BOLD_BLUE}██████╔╝${BOLD_MAGENTA}╚███╔███╔╝${BOLD_GREEN}██║${BOLD_CYAN}███████╗${BOLD_BLUE}███████╗${NC}"
-echo "${BOLD_CYAN}    ╚═╝  ╚═╝${BOLD_BLUE}╚═════╝ ${BOLD_MAGENTA} ╚══╝╚══╝ ${BOLD_GREEN}╚═╝${BOLD_CYAN}╚══════╝${BOLD_BLUE}╚══════╝${NC}"
+echo "${BOLD_MAGENTA}     █████╗ ██████╗ ██╗    ██╗██╗███████╗███████╗${NC}"
+echo "${BOLD_MAGENTA}    ██╔══██╗██╔══██╗██║    ██║██║╚══███╔╝██╔════╝${NC}"
+echo "${BOLD_MAGENTA}    ███████║██║  ██║██║ █╗ ██║██║  ███╔╝ █████╗  ${NC}"
+echo "${BOLD_MAGENTA}    ██╔══██║██║  ██║██║███╗██║██║ ███╔╝  ██╔══╝  ${NC}"
+echo "${BOLD_MAGENTA}    ██║  ██║██████╔╝╚███╔███╔╝██║███████╗███████╗${NC}"
+echo "${BOLD_MAGENTA}    ╚═╝  ╚═╝╚═════╝  ╚══╝╚══╝ ╚═╝╚══════╝╚══════╝${NC}"
 echo ""
 echo "    ${DIM}Open-source event monitoring with deterministic rules${NC}"
 echo "    ${DIM}and webhook alerts.${NC}"
