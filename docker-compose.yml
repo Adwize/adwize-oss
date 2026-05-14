@@ -1,0 +1,77 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: adwize_postgres
+    environment:
+      POSTGRES_DB: ${DB_NAME:-adwize}
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres} -d ${DB_NAME:-adwize}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: .
+      dockerfile: images/Dockerfile.api
+    container_name: adwize_api
+    command: >
+      sh -c "uv run alembic upgrade head &&
+             uv run uvicorn api.main:app --host 0.0.0.0 --port 8000 --reload"
+    environment:
+      DATABASE_HOST: postgres
+      DATABASE_PORT: 5432
+      DATABASE_NAME: ${DB_NAME:-adwize}
+      DATABASE_USER: ${DB_USER:-postgres}
+      DATABASE_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
+      API_KEY: ${API_KEY:-}
+      WEBHOOK_URL: ${WEBHOOK_URL:-}
+      PYTHONPATH: /app
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./api:/app/api
+      - ./migrations:/app/migrations
+      - ./alembic.ini:/app/alembic.ini
+      - ./worker:/app/worker
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  worker:
+    build:
+      context: .
+      dockerfile: images/Dockerfile.worker
+    container_name: adwize_worker
+    command: python worker/rule_monitoring.py 5
+    environment:
+      DATABASE_HOST: postgres
+      DATABASE_PORT: 5432
+      DATABASE_NAME: ${DB_NAME:-adwize}
+      DATABASE_USER: ${DB_USER:-postgres}
+      DATABASE_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
+      WEBHOOK_URL: ${WEBHOOK_URL:-}
+      PYTHONPATH: /app
+    volumes:
+      - ./worker:/app/worker
+      - ./api:/app/api
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+    driver: local
