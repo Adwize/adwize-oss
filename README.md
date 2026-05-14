@@ -163,10 +163,13 @@ The CLI stores config in `~/.adwize/config.json` (created by `adwize setup`). En
 ## Development
 
 ```bash
-uv sync
-uv run uvicorn api.main:app --reload
-uv run python worker/rule_monitoring.py --once
-uv run python mcp_server/server.py
+uv sync                                         # Install dependencies
+uv run uvicorn api.main:app --reload            # Run API locally
+uv run python worker/rule_monitoring.py --once  # Run worker once
+uv run python mcp_server/server.py              # Run MCP server
+
+# Run MCP model inspector
+ADWIZE_API_URL=http://localhost:8000 uv run mcp dev mcp_server/server.py
 ```
 
 ## License
