@@ -2,6 +2,8 @@
 
 Open-source event monitoring with deterministic rules and webhook alerts. Ingest events from any source, define validation and threshold rules, and get notified instantly via webhooks when something goes wrong.
 
+Related open-source tool: **[adwize-audit](https://github.com/Adwize/adwize-audit)** — audit any website’s GA4/GTM measurement setup from the outside (no Google account required).
+
 ## Features
 
 - **Event ingestion** — Stream events via REST API with buffered bulk writes
@@ -173,6 +175,12 @@ uv run python mcp_server/server.py              # Run MCP server
 # Run MCP model inspector
 ADWIZE_API_URL=http://localhost:8000 uv run mcp dev mcp_server/server.py
 ```
+
+## Related
+
+- [adwize-audit](https://github.com/Adwize/adwize-audit) — outside-in GA4/GTM measurement audits
+- [Adwize docs](https://docs.getadwize.com) — hosted product documentation
+- [Adwize on GitHub](https://github.com/Adwize)
 
 ## License
 
