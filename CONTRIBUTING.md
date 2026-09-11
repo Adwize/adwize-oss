@@ -6,7 +6,7 @@ Thanks for your interest in contributing to Adwize! This guide will help you get
 
 1. **Clone the repo:**
    ```bash
-   git clone https://github.com/tagsavvy/adwize-oss.git
+   git clone https://github.com/Adwize/adwize-oss.git
    cd adwize-oss
    ```
 
