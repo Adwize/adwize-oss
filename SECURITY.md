@@ -6,7 +6,7 @@ If you discover a security vulnerability in adwize-oss, please report it respons
 
 **Do NOT open a public GitHub issue for security vulnerabilities.**
 
-Instead, email **security@getadwize.com** with:
+Instead, email **qt@datastarter.ca** with:
 
 - A description of the vulnerability
 - Steps to reproduce
