@@ -51,8 +51,15 @@ fi
 
 if [ -d "$INSTALL_DIR" ]; then
     warn "Directory $INSTALL_DIR already exists."
-    read -p "  Update existing installation? [Y/n] " -n 1 -r
-    echo
+    # Under `curl | bash`, stdin is the script pipe — never `read` from it.
+    # Prefer /dev/tty when present; otherwise default to update (same as Yes).
+    REPLY="Y"
+    if [ -r /dev/tty ]; then
+        read -p "  Update existing installation? [Y/n] " -n 1 -r </dev/tty
+        echo
+    else
+        info "Non-interactive install (no TTY); updating existing installation."
+    fi
     if [[ $REPLY =~ ^[Yy]$ ]] || [[ -z $REPLY ]]; then
         info "Updating..."
         cd "$INSTALL_DIR"
