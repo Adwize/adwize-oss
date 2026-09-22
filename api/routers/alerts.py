@@ -19,7 +19,7 @@ from api.schemas.alert import (
     GroupedAlertResponse,
     TestNotificationRequest,
 )
-from api.services.alert_dispatcher import dispatch_webhook
+from api.services.alert_dispatcher import dispatch_webhook, redact_webhook_url
 
 router = APIRouter()
 logger = get_logger(__name__)
@@ -398,4 +398,4 @@ async def send_test_notification(
         persist_log=False,
     )
 
-    return {"success": success, "webhook_url": request.webhook_url}
+    return {"success": success, "webhook_url": redact_webhook_url(request.webhook_url)}

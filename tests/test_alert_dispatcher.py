@@ -10,6 +10,7 @@ from api.services.alert_dispatcher import (
     _build_base_payload,
     _format_payload,
     dispatch_webhook,
+    redact_webhook_url,
 )
 
 
@@ -41,6 +42,23 @@ def make_alert():
 def db_mock():
     mock = AsyncMock(spec=AsyncSession)
     return mock
+
+
+class TestRedactWebhookUrl:
+    def test_slack_style_path_token(self):
+        url = "https://hooks.slack.com/services/T00/B00/secret-token"
+        assert redact_webhook_url(url) == "https://hooks.slack.com/***"
+
+    def test_query_string_secret(self):
+        url = "https://example.com/hook?token=abc123&x=1"
+        assert redact_webhook_url(url) == "https://example.com/***"
+
+    def test_bare_host_no_path(self):
+        assert redact_webhook_url("https://hooks.example.com") == "https://hooks.example.com"
+
+    def test_empty_and_garbage(self):
+        assert redact_webhook_url("") == ""
+        assert redact_webhook_url("not-a-url") == "[redacted-url]"
 
 
 class TestPayloadFormatting:
@@ -139,10 +157,17 @@ class TestDispatchWebhook:
 
             result = await dispatch_webhook(
                 alert=alert,
-                webhook_url="https://example.com/webhook",
+                webhook_url="https://hooks.slack.com/services/T00/B00/secret",
                 db=db_mock,
             )
 
         assert result is True
         db_mock.add.assert_called()
         db_mock.commit.assert_called()
+        log_entry = db_mock.add.call_args[0][0]
+        assert log_entry.destination_url == "https://hooks.slack.com/***"
+        # Delivery must still use the original URL
+        mock_client.post.assert_called_once()
+        assert mock_client.post.call_args[0][0] == (
+            "https://hooks.slack.com/services/T00/B00/secret"
+        )

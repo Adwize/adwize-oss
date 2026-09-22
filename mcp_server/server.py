@@ -6,6 +6,8 @@ import os
 import httpx
 from mcp.server.fastmcp import FastMCP
 
+from api.services.alert_dispatcher import redact_webhook_url
+
 mcp = FastMCP(
     "Adwize",
     instructions="Monitor analytics events, manage rules, and inspect alerts via Adwize API.",
@@ -263,6 +265,7 @@ def test_webhook(webhook_url: str, webhook_type: str = "webhook") -> str:
         webhook_url: The webhook URL to test
         webhook_type: Type of webhook: 'webhook', 'slack', or 'teams'
     """
+    safe_url = redact_webhook_url(webhook_url)
     with _client() as client:
         resp = client.post(
             f"{API_PREFIX}/alerts/test-notification",
@@ -271,9 +274,9 @@ def test_webhook(webhook_url: str, webhook_type: str = "webhook") -> str:
         resp.raise_for_status()
         result = resp.json()
         if result.get("success"):
-            return f"Test notification sent successfully to {webhook_url}"
+            return f"Test notification sent successfully to {safe_url}"
         else:
-            return f"Failed to send test notification to {webhook_url}"
+            return f"Failed to send test notification to {safe_url}"
 
 
 @mcp.tool()
