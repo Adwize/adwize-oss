@@ -43,6 +43,13 @@ def _wait_for_health(api_url: str, timeout: int = 30) -> bool:
     return False
 
 
+def _format_api_key_summary(api_key: str | None) -> str:
+    """Return a summary line that never includes the full API key."""
+    if api_key:
+        return f"API key: set (….{api_key[-4:]})"
+    return "API key: not set"
+
+
 def run_setup():
     """Interactive setup wizard for Adwize."""
     console.print(
@@ -74,10 +81,11 @@ def run_setup():
         default=existing.get("api_url", "http://localhost:8000"),
     )
 
-    db_password = Prompt.ask("Database password", default="changeme")
+    db_password = Prompt.ask("Database password", password=True, default="changeme")
 
     api_key = Prompt.ask(
         "API key [dim](leave empty for no auth)[/dim]",
+        password=True,
         default=existing.get("api_key") or "",
     )
 
@@ -181,7 +189,8 @@ def run_setup():
             "[bold green]Setup complete![/bold green]\n\n"
             f"  API:    {api_url}\n"
             f"  Docs:   {api_url}/docs\n"
-            f"  Config: {config_path}\n" + (f"  API Key: {api_key}\n" if api_key else "") + "\n"
+            f"  Config: {config_path}\n"
+            f"  {_format_api_key_summary(api_key)}\n\n"
             "  [dim]adwize status          — check health[/dim]\n"
             "  [dim]adwize events list     — view events[/dim]\n"
             "  [dim]adwize rules list      — view rules[/dim]\n"
