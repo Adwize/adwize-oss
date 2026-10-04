@@ -1,3 +1,4 @@
+import json
 import os
 import shutil
 import subprocess
@@ -14,18 +15,25 @@ from cli import config
 
 console = Console()
 
-MCP_SNIPPET = """{
-  "mcpServers": {
-    "adwize": {
-      "command": "uv",
-      "args": ["run", "python", "mcp_server/server.py"],
-      "cwd": "%s",
-      "env": {
-        "ADWIZE_API_URL": "%s"
-      }
-    }
-  }
-}"""
+
+def _mcp_snippet(project_dir: str, api_url: str, api_key: str = "") -> str:
+    """Build MCP client config JSON; include ADWIZE_API_KEY when set."""
+    env: dict[str, str] = {"ADWIZE_API_URL": api_url}
+    if api_key:
+        env["ADWIZE_API_KEY"] = api_key
+    return json.dumps(
+        {
+            "mcpServers": {
+                "adwize": {
+                    "command": "uv",
+                    "args": ["run", "python", "mcp_server/server.py"],
+                    "cwd": project_dir,
+                    "env": env,
+                }
+            }
+        },
+        indent=2,
+    )
 
 
 def _wait_for_health(api_url: str, timeout: int = 30) -> bool:
@@ -172,8 +180,13 @@ def run_setup():
             border_style="dim",
         )
     )
-    snippet = MCP_SNIPPET % (project_dir, api_url)
+    snippet = _mcp_snippet(project_dir, api_url, api_key)
     console.print(Syntax(snippet, "json", theme="monokai", padding=1))
+    if api_key:
+        console.print(
+            "[dim]ADWIZE_API_KEY is also in ~/.adwize/config.json; "
+            "`adwize mcp` injects it automatically.[/dim]\n"
+        )
 
     # --- Summary ---
     console.print(
