@@ -17,5 +17,11 @@ RUN uv sync --frozen --no-dev 2>/dev/null || uv sync --no-dev
 
 COPY . .
 
+RUN groupadd --gid 10001 app \
+    && useradd --uid 10001 --gid app --shell /usr/sbin/nologin --create-home app \
+    && chown -R app:app /app
+
+USER app
+
 ENTRYPOINT ["uv", "run"]
 CMD ["python", "worker/rule_monitoring.py", "--once"]
