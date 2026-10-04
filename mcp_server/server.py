@@ -14,6 +14,9 @@ mcp = FastMCP(
 API_BASE = os.getenv("ADWIZE_API_URL", "http://localhost:8000").rstrip("/")
 API_PREFIX = f"{API_BASE}/api/v1"
 
+# Keep MCP send amplification bounded until EventBatch gains a server-side max (#18).
+MAX_SEND_EVENTS_COUNT = 100
+
 
 def _headers() -> dict[str, str]:
     headers = {"Content-Type": "application/json"}
@@ -77,8 +80,14 @@ def send_events(source: str, event_type: str, data: dict, count: int = 1) -> str
         source: Event source identifier
         event_type: Type of event
         data: Event payload as a dictionary
-        count: Number of identical events to send
+        count: Number of identical events to send (1–100)
     """
+    if count < 1 or count > MAX_SEND_EVENTS_COUNT:
+        return (
+            f"count must be between 1 and {MAX_SEND_EVENTS_COUNT} "
+            f"(got {count}). Cap exists to avoid amplifying unbounded ingest."
+        )
+
     batch = {
         "source": source,
         "events": [{"type": event_type, "data": data} for _ in range(count)],
