@@ -1,0 +1,26 @@
+# Secrets — never bake host env into image layers
+.env
+.env.*
+!.env.example
+
+# Host virtualenvs (overwrite the image's /app/.venv from uv sync)
+.venv
+venv/
+
+# VCS and caches (larger context / slower builds)
+.git
+__pycache__/
+*.py[oc]
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Local data and logs
+postgres_data/
+*.log
+
+# Editor / OS junk
+.vscode/
+.idea/
+.DS_Store
