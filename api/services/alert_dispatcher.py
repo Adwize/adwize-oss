@@ -2,6 +2,7 @@ import asyncio
 import uuid
 from datetime import datetime, timedelta, timezone
 from typing import Any
+from urllib.parse import urlparse, urlunparse
 
 import httpx
 from sqlalchemy import select
@@ -12,6 +13,24 @@ from api.models.alert import Alert
 from api.models.notification_log import NotificationLog
 
 logger = get_logger(__name__)
+
+
+def redact_webhook_url(url: str) -> str:
+    """Keep scheme+host for debugging; redact path/query/fragment (often secrets).
+
+    Slack/Teams/Discord webhook tokens live in the path or query string. Logs,
+    NotificationLog rows, and API/MCP responses must not retain them.
+    """
+    if not url:
+        return url
+    try:
+        parsed = urlparse(url)
+        if not parsed.scheme and not parsed.netloc:
+            return "[redacted-url]"
+        redacted_path = "/***" if parsed.path else ""
+        return urlunparse((parsed.scheme, parsed.netloc, redacted_path, "", "", ""))
+    except Exception:
+        return "[redacted-url]"
 
 
 async def dispatch_webhook(
@@ -94,13 +113,14 @@ async def _send_webhook_with_retry(
 ) -> bool:
     """Send webhook with retry logic and logging."""
     request_headers = {"Content-Type": "application/json"}
+    safe_url = redact_webhook_url(url)
 
     for attempt in range(1, max_retries + 1):
         log_entry = NotificationLog(
             id=uuid.uuid4(),
             alert_id=alert_id,
             destination_type=destination_type,
-            destination_url=url,
+            destination_url=safe_url,
             payload=payload,
             attempts=attempt,
         )
@@ -116,28 +136,28 @@ async def _send_webhook_with_retry(
                     log_entry.delivered_at = datetime.now(timezone.utc).replace(tzinfo=None)
                     db.add(log_entry)
                     await db.commit()
-                    logger.info(f"Webhook delivered to {url} (attempt {attempt})")
+                    logger.info(f"Webhook delivered to {safe_url} (attempt {attempt})")
                     return True
                 else:
                     logger.warning(
-                        f"Webhook to {url} failed with status {response.status_code} "
+                        f"Webhook to {safe_url} failed with status {response.status_code} "
                         f"(attempt {attempt})"
                     )
 
         except httpx.TimeoutException:
             log_entry.response_body = f"Timeout after {timeout}s"
-            logger.warning(f"Webhook to {url} timed out (attempt {attempt})")
+            logger.warning(f"Webhook to {safe_url} timed out (attempt {attempt})")
 
         except Exception as e:
             log_entry.response_body = f"Error: {str(e)[:500]}"
-            logger.error(f"Webhook to {url} failed: {e} (attempt {attempt})")
+            logger.error(f"Webhook to {safe_url} failed: {e} (attempt {attempt})")
 
         db.add(log_entry)
         await db.commit()
         if attempt < max_retries:
             await asyncio.sleep(2**attempt)
 
-    logger.error(f"Webhook to {url} failed after {max_retries} attempts")
+    logger.error(f"Webhook to {safe_url} failed after {max_retries} attempts")
     return False
 
 
