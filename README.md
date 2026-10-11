@@ -129,7 +129,9 @@ Connect Adwize to Cursor, Claude Desktop, Windsurf, or any MCP-compatible AI ass
 }
 ```
 
-Or without the CLI on PATH:
+When the API uses an `API_KEY`, configure it via `adwize setup` / `~/.adwize/config.json` — `adwize mcp` injects `ADWIZE_API_KEY` from that config.
+
+Or without the CLI on PATH (include `ADWIZE_API_KEY` when `API_KEY` is set on the API):
 
 ```json
 {
@@ -139,7 +141,8 @@ Or without the CLI on PATH:
       "args": ["run", "python", "mcp_server/server.py"],
       "cwd": "/path/to/adwize-oss",
       "env": {
-        "ADWIZE_API_URL": "http://localhost:8000"
+        "ADWIZE_API_URL": "http://localhost:8000",
+        "ADWIZE_API_KEY": "your-api-key"
       }
     }
   }
