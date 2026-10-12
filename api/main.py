@@ -21,13 +21,18 @@ async def lifespan(app: FastAPI):
     logger.info("Shutting down...")
 
 
+# When API_KEY is set, disable interactive docs / OpenAPI so unauthenticated
+# clients cannot inventory the API. Keep localhost-friendly docs when unset.
+_docs_enabled = not settings.api_key
+
 app = FastAPI(
     title=settings.app_name,
     version=settings.app_version,
     debug=settings.debug,
     lifespan=lifespan,
-    docs_url="/docs",
-    redoc_url="/redoc",
+    docs_url="/docs" if _docs_enabled else None,
+    redoc_url="/redoc" if _docs_enabled else None,
+    openapi_url="/openapi.json" if _docs_enabled else None,
 )
 
 
