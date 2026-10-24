@@ -13,7 +13,7 @@ class Settings(BaseSettings):
     )
 
     app_name: str = Field(default="Adwize")
-    app_version: str = Field(default="0.1.0")
+    app_version: str = Field(default="0.1.2")
     debug: bool = Field(default=False)
     log_level: str = Field(default="INFO")
 
