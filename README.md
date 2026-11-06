@@ -23,11 +23,11 @@ Related open-source tool: **[adwize-audit](https://github.com/Adwize/adwize-audi
 curl -fsSL https://raw.githubusercontent.com/Adwize/adwize-oss/main/install.sh | bash
 ```
 
-Then run the setup wizard:
+The installer appends the CLI to your shell config, but `curl | bash` cannot update `PATH` in the current terminal. Run setup with the full path now, then open a new terminal (or `source` that rc file — `~/.bashrc`, `~/.zshrc`, or `~/.config/fish/config.fish`) to use `adwize` directly:
 
 ```bash
 cd ~/adwize
-adwize setup
+~/adwize/.venv/bin/adwize setup
 ```
 
 ### Manual setup
