@@ -79,6 +79,11 @@ cd "$INSTALL_DIR"
 info "Installing Adwize CLI..."
 uv sync --quiet 2>/dev/null || uv sync
 
+# `curl | bash` cannot export PATH into the caller's shell. Track whether this
+# shell still needs the venv binary (or a new terminal) to run `adwize`.
+VENV_BIN="$INSTALL_DIR/.venv/bin"
+RC_FILE=""
+
 if ! command -v adwize >/dev/null 2>&1; then
     info "Adding adwize to PATH..."
 
@@ -90,12 +95,17 @@ if ! command -v adwize >/dev/null 2>&1; then
         *)    RC_FILE="$HOME/.profile" ;;
     esac
 
-    VENV_BIN="$INSTALL_DIR/.venv/bin"
     if [ -d "$VENV_BIN" ]; then
-        if ! grep -q "adwize" "$RC_FILE" 2>/dev/null; then
+        # Match the venv path itself. A comment, alias, or ADWIZE_* export
+        # that merely contains the word "adwize" must not suppress this line.
+        if ! grep -qF "$VENV_BIN" "$RC_FILE" 2>/dev/null; then
             echo "" >> "$RC_FILE"
             echo "# Adwize CLI" >> "$RC_FILE"
-            echo "export PATH=\"$VENV_BIN:\$PATH\"" >> "$RC_FILE"
+            if [ "$SHELL_NAME" = "fish" ]; then
+                echo "fish_add_path \"$VENV_BIN\"" >> "$RC_FILE"
+            else
+                echo "export PATH=\"$VENV_BIN:\$PATH\"" >> "$RC_FILE"
+            fi
             info "Added $VENV_BIN to PATH in $RC_FILE"
         fi
         export PATH="$VENV_BIN:$PATH"
@@ -107,7 +117,14 @@ echo "  ${BOLD_GREEN}✓ Adwize installed successfully!${NC}"
 echo ""
 echo "  ${DIM}Next steps:${NC}"
 echo "    ${BOLD_CYAN}cd $INSTALL_DIR${NC}"
-echo "    ${BOLD_CYAN}adwize setup${NC}"
+if [ -n "$RC_FILE" ]; then
+    # Works in this shell; the rc-file PATH line applies only to a new one.
+    echo "    ${BOLD_CYAN}$VENV_BIN/adwize setup${NC}"
+    echo ""
+    echo "  ${DIM}Open a new terminal (or \`source $RC_FILE\`) to use \`adwize\` directly.${NC}"
+else
+    echo "    ${BOLD_CYAN}adwize setup${NC}"
+fi
 echo ""
 echo "  ${DIM}This will configure your .env and start services via Docker Compose.${NC}"
 echo ""
